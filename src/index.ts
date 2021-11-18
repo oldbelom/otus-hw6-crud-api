@@ -1,1 +1,2 @@
-import "./scss/style.scss";
+import { LocalStorage } from "./ts/LocalStorage";
+import { Firebase } from "./ts/Firebase";

@@ -1,4 +1,3 @@
-import { off } from "firebase/database";
 import { Firebase } from "./Firebase";
 
 const db = new Firebase();
