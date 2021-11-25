@@ -1,11 +1,22 @@
+export interface ITask {
+  date: string;
+  tag: string;
+  status: string;
+  content: string;
+  [key: string]: string;
+}
+
 export abstract class CRUD {
-  abstract createItem(itemName: string, itemValue: string, path?: string): void;
+  abstract createItem(task: ITask, path?: string): Promise<void>;
 
-  abstract readItem(itemName: string): void;
+  abstract readItem(itemName: string): Promise<string> | Promise<ITask>;
 
-  abstract updateItem(itemName: string, newValue: string, path?: string): void;
+  abstract updateItem(
+    task: ITask,
+    taskKey: string,
+    newValue: string,
+    path?: string
+  ): Promise<void>;
 
-  abstract deleteItem(itemName: string): void;
-
-  abstract filterItem(path?: string): void;
+  abstract deleteItem(path: string): Promise<void>;
 }

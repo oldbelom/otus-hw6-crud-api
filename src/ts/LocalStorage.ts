@@ -1,33 +1,29 @@
-import { CRUD } from "./CRUD";
+import { CRUD, ITask } from "./CRUD";
 
 export class LocalStorage extends CRUD {
-  createItem = async (itemName: string, itemValue: string) => {
-    localStorage.setItem(itemName, itemValue);
+  createItem = async (task: ITask, taskKey: string): Promise<void> => {
+    localStorage.setItem(taskKey, JSON.stringify(task));
   };
 
-  readItem = async (itemName: string) => {
-    if (localStorage.getItem(itemName) === null) {
+  readItem = async (taskKey: string): Promise<string> => {
+    if (localStorage.getItem(taskKey) === null) {
       console.log("No matching item");
     }
-    return localStorage.getItem(itemName) as string;
+    return JSON.parse(localStorage.getItem(taskKey) as string);
   };
 
-  updateItem = async (itemName: string, newValue: string) => {
-    localStorage.setItem(itemName, newValue);
+  updateItem = async (
+    task: ITask,
+    updatedFiekd: string,
+    newValue: string,
+    taskKey: string
+  ): Promise<void> => {
+    const newTask = task;
+    newTask[updatedFiekd] = newValue;
+    localStorage.setItem(taskKey, JSON.stringify(newTask));
   };
 
-  deleteItem = async (itemName: string) => {
-    localStorage.removeItem(itemName);
-  };
-
-  filterItem = async () => {
-    const itemsArray: string[] = [];
-    const localStorageKeys = Object.keys(localStorage);
-
-    for (let i = 0; i < localStorageKeys.length; i++) {
-      itemsArray.push(localStorage.getItem(localStorageKeys[i]) as string);
-    }
-
-    return itemsArray.sort();
+  deleteItem = async (taskKey: string): Promise<void> => {
+    localStorage.removeItem(taskKey);
   };
 }

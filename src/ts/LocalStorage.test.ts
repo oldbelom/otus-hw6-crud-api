@@ -2,25 +2,31 @@ import { LocalStorage } from "./LocalStorage";
 
 const calendar = new LocalStorage();
 
+const testTask = {
+  date: "05-12-2021",
+  tag: "sport",
+  status: "done",
+  content: "go for a run",
+};
+
 describe("LocalStorage", () => {
   beforeEach(() => {
     localStorage.clear();
   });
 
   it("creare element in localStorage", async () => {
-    await calendar.createItem("key", "value");
+    await calendar.createItem(testTask, "task-1");
     expect(localStorage.length).toBe(1);
-    await calendar.createItem("key-2", "value-2");
+    await calendar.createItem(testTask, "task-2");
     expect(localStorage.length).toBe(2);
   });
 
   it("read element from localStorage", async () => {
-    await calendar.createItem("key", "value");
-    const item = await calendar.readItem("key");
-    console.log(item);
-
-    expect(item).toBe("value");
+    await calendar.createItem(testTask, "task-1");
+    const item = await calendar.readItem("task-1");
+    expect(item).toEqual(testTask);
   });
+
   it("print a message in console if there are no matching items when reading", async () => {
     const spy = jest.spyOn(console, "log");
     await calendar.readItem("test");
@@ -28,12 +34,11 @@ describe("LocalStorage", () => {
   });
 
   it("update item", async () => {
-    localStorage.setItem("key", "value");
-    let item = localStorage.getItem("key");
-    expect(item).toBe("value");
-    await calendar.updateItem("key", "new-value");
-    item = localStorage.getItem("key");
-    expect(item).toBe("new-value");
+    await calendar.createItem(testTask, "task-1");
+    const item = await calendar.readItem("task-1");
+    expect(item).toEqual(testTask);
+    await calendar.updateItem(testTask, "tag", "work", "task-1");
+    expect(testTask.tag).toBe("work");
   });
 
   it("delete item", async () => {
@@ -41,13 +46,5 @@ describe("LocalStorage", () => {
     await calendar.deleteItem("key");
     const item = localStorage.getItem("key");
     expect(item).toBe(null);
-  });
-
-  it("filters items", async () => {
-    localStorage.setItem("key-1", "ccc");
-    localStorage.setItem("key-2", "bbb");
-    localStorage.setItem("key-3", "aaa");
-    const result = await calendar.filterItem();
-    expect(result).toEqual(["aaa", "bbb", "ccc"]);
   });
 });

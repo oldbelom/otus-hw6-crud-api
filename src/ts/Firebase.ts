@@ -1,10 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, set, get, ref, child, update } from "firebase/database";
-import { CRUD } from "./CRUD";
-
-interface IDatabaseItem {
-  [key: string]: string | null;
-}
+import { CRUD, ITask } from "./CRUD";
 
 export class Firebase extends CRUD {
   private firebaseConfig = {
@@ -22,16 +18,14 @@ export class Firebase extends CRUD {
 
   private database = getDatabase(this.app);
 
-  createItem = async (itemName: string, itemValue: string, path: string) => {
-    const obj: IDatabaseItem = {};
-    obj[itemName] = itemValue;
-    set(ref(this.database, path), obj);
+  createItem = async (task: ITask, path: string): Promise<void> => {
+    set(ref(this.database, path), task);
   };
 
-  readItem = async (itemPath: string) => {
+  readItem = async (itemPath: string): Promise<ITask> => {
     const dbRef = ref(getDatabase());
 
-    const data = get(child(dbRef, itemPath)).then((snapshot) => {
+    const data = await get(child(dbRef, itemPath)).then((snapshot) => {
       if (!snapshot.exists()) {
         console.log("No data available");
       }
@@ -40,28 +34,18 @@ export class Firebase extends CRUD {
     return data;
   };
 
-  updateItem = async (itemName: string, newValue: string, path: string) => {
-    const obj: IDatabaseItem = {};
-    obj[itemName] = newValue;
-    update(ref(this.database, path), obj);
+  updateItem = async (
+    task: ITask,
+    taskKey: string,
+    newValue: string,
+    path: string
+  ): Promise<void> => {
+    const newTask = task;
+    newTask[taskKey] = newValue;
+    update(ref(this.database, path), newTask);
   };
 
-  deleteItem = async (itemName: string) => {
-    const obj: IDatabaseItem = {};
-    obj[itemName] = null;
-    update(ref(this.database), obj);
-  };
-
-  filterItem = async (itemPath: string) => {
-    const dbRef = ref(getDatabase());
-
-    const data = get(child(dbRef, itemPath)).then((snapshot) => {
-      if (!snapshot.exists()) {
-        console.log("No data available");
-      }
-      return snapshot.val();
-    });
-
-    return Object.values(data).sort();
+  deleteItem = async (path: string): Promise<void> => {
+    set(ref(this.database, path), null);
   };
 }
